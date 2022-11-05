@@ -15,7 +15,6 @@
 import search
 import random
 
-# Module Classes
 
 class EightPuzzleState:
     """
@@ -212,6 +211,14 @@ class EightPuzzleSearchProblem(search.SearchProblem):
             succ.append((state.result(a), a, 1))
         return succ
 
+    def getCells(self, state):
+        puzzleArray = []
+        for row in range( 3 ):
+            for col in range( 3 ):
+                puzzleArray.append(state.cells[row][col])
+
+        return puzzleArray
+
     def getCostOfActions(self, actions):
         """
          actions: A list of actions to take
@@ -268,8 +275,8 @@ if __name__ == '__main__':
     print(puzzle)
 
     problem = EightPuzzleSearchProblem(puzzle)
-    path = search.breadthFirstSearch(problem)
-    print('BFS found a path of %d moves: %s' % (len(path), str(path)))
+    path = search.aStarSearch(problem)
+    print('A* found a path of %d moves: %s' % (len(path), str(path)))
     curr = puzzle
     i = 1
     for a in path:
@@ -277,5 +284,5 @@ if __name__ == '__main__':
         print('After %d move%s: %s' % (i, ("", "s")[i>1], a))
         print(curr)
 
-        raw_input("Press return for the next state...")   # wait for key stroke
+        input("Press return for the next state...")   # wait for key stroke
         i += 1

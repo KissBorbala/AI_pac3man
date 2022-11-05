@@ -61,6 +61,9 @@ class SearchProblem:
         """
         util.raiseNotDefined()
 
+    def getCells(self, state):
+
+        util.raiseNotDefined()
 
 def tinyMazeSearch(problem):
     """
@@ -81,23 +84,75 @@ def depthFirstSearch(problem):
 
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
+
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #util.raiseNotDefined()
+
+    visited = list()
+    stack = util.Stack()
+    start = problem.getStartState()
+    stack.push((start, []))
+
+    while not stack.isEmpty():
+        current, direction = stack.pop()
+        if current not in visited:
+            visited.append(current)
+            if problem.isGoalState(current):
+                return direction
+            adjacent = problem.getSuccessors(current)
+            for node in adjacent:
+                stack.push((node[0], direction + [node[1]]))
+
+    return direction
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #util.raiseNotDefined()
+
+    visited = list()
+    queue = util.Queue()
+    start = problem.getStartState()
+    queue.push((start, []))
+
+    while not queue.isEmpty():
+        current, direction = queue.pop()
+        if current not in visited:
+            visited.append(current)
+            if problem.isGoalState(current):
+                return direction
+            adjacent = problem.getSuccessors(current)
+            for node in adjacent:
+                queue.push((node[0], direction + [node[1]]))
+
+    return direction
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    visited = {}
+    startState = (problem.getStartState(), [], 0)
+    queue = util.PriorityQueue()
+    queue.push(startState, 0)
+
+    while not queue.isEmpty():
+        (current, direction, cost) = queue.pop()
+        if not current in visited or cost < visited[current]:
+            visited[current] = cost
+            if problem.isGoalState(current):
+                return direction
+            adjacent = problem.getSuccessors(current)
+            for s in adjacent:
+                newNode = (s[0], direction + [s[1]], cost + s[2])
+                queue.update(newNode, cost + s[2])
+
+    return direction
 
 def nullHeuristic(state, problem=None):
     """
@@ -106,11 +161,63 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
-def aStarSearch(problem, heuristic=nullHeuristic):
+def misplacedTilesHeuristic(position, problem):
+
+    misplaced = 0;
+    puzzleArray = problem.getCells(position)
+    for i in range(9):
+        if puzzleArray[i] != i:
+            misplaced = misplaced + 1
+    return misplaced
+
+def misplacedManhattanHeuristic(position, problem):
+    manhattan = 0;
+    puzzleArray = problem.getCells(position)
+    coordinates = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
+
+    for i in range(9):
+        if puzzleArray[i] != i:
+            xy1 = coordinates[i];
+            xy2 = coordinates[puzzleArray[i]]
+            manhattan = manhattan + abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+    return manhattan
+
+def misplacedEuclideanHeuristic(position, problem):
+    euclidean = 0;
+    puzzleArray = problem.getCells(position)
+    coordinates = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
+
+    for i in range(9):
+        if puzzleArray[i] != i:
+            xy1 = coordinates[i];
+            xy2 = coordinates[puzzleArray[i]]
+            euclidean = euclidean + ( (xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2 ) ** 0.5
+
+    return euclidean
+
+def aStarSearch(problem, heuristic=misplacedEuclideanHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
+    visited = {}
+    position = problem.getStartState()
+    startState = (position, [], heuristic(position, problem))
+    queue = util.PriorityQueue()
+    queue.push(startState, heuristic(position, problem))
+
+    while not queue.isEmpty():
+        (current, direction, cost) = queue.pop()
+        if not current in visited or cost < visited[current]:
+            visited[current] = cost
+            if problem.isGoalState(current):
+                return direction
+            adjacent = problem.getSuccessors(current)
+            for s in adjacent:
+                newNode = (s[0], direction + [s[1]], cost + heuristic(current, problem))
+                queue.update(newNode, cost + heuristic(current, problem))
+
+    return direction
 
 # Abbreviations
 bfs = breadthFirstSearch
