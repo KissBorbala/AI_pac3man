@@ -173,7 +173,11 @@ def misplacedTilesHeuristic(position, problem):
 def misplacedManhattanHeuristic(position, problem):
     manhattan = 0;
     puzzleArray = problem.getCells(position)
-    coordinates = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
+    coordinates = []
+
+    for i in range(5):
+        for j in range(5):
+            coordinates.append([i, j]);
 
     for i in range(9):
         if puzzleArray[i] != i:
@@ -186,7 +190,11 @@ def misplacedManhattanHeuristic(position, problem):
 def misplacedEuclideanHeuristic(position, problem):
     euclidean = 0;
     puzzleArray = problem.getCells(position)
-    coordinates = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
+    coordinates = []
+
+    for i in range(5):
+        for j in range(5):
+            coordinates.append([i,j]);
 
     for i in range(9):
         if puzzleArray[i] != i:
@@ -196,7 +204,7 @@ def misplacedEuclideanHeuristic(position, problem):
 
     return euclidean
 
-def aStarSearch(problem, heuristic=misplacedEuclideanHeuristic):
+def aStarSearch(problem, heuristic=misplacedManhattanHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
 

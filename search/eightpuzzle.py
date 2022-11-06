@@ -14,6 +14,7 @@
 
 import search
 import random
+import time
 
 
 class EightPuzzleState:
@@ -51,9 +52,9 @@ class EightPuzzleState:
         self.cells = []
         numbers = numbers[:] # Make a copy so as not to cause side-effects.
         numbers.reverse()
-        for row in range( 3 ):
+        for row in range( 5 ):
             self.cells.append( [] )
-            for col in range( 3 ):
+            for col in range( 5 ):
                 self.cells[row].append( numbers.pop() )
                 if self.cells[row][col] == 0:
                     self.blankLocation = row, col
@@ -77,8 +78,8 @@ class EightPuzzleState:
         False
         """
         current = 0
-        for row in range( 3 ):
-            for col in range( 3 ):
+        for row in range( 5 ):
+            for col in range( 5 ):
                 if current != self.cells[row][col]:
                     return False
                 current += 1
@@ -98,11 +99,11 @@ class EightPuzzleState:
         row, col = self.blankLocation
         if(row != 0):
             moves.append('up')
-        if(row != 2):
+        if(row != 4):
             moves.append('down')
         if(col != 0):
             moves.append('left')
-        if(col != 2):
+        if(col != 4):
             moves.append('right')
         return moves
 
@@ -135,7 +136,7 @@ class EightPuzzleState:
             raise "Illegal Move"
 
         # Create a copy of the current eightPuzzle
-        newPuzzle = EightPuzzleState([0, 0, 0, 0, 0, 0, 0, 0, 0])
+        newPuzzle = EightPuzzleState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         newPuzzle.cells = [values[:] for values in self.cells]
         # And update it to reflect the move
         newPuzzle.cells[row][col] = self.cells[newrow][newcol]
@@ -154,7 +155,7 @@ class EightPuzzleState:
               EightPuzzleState([1, 0, 2, 3, 4, 5, 6, 7, 8]).result('left')
           True
         """
-        for row in range( 3 ):
+        for row in range( 5 ):
             if self.cells[row] != other.cells[row]:
                 return False
         return True
@@ -213,8 +214,8 @@ class EightPuzzleSearchProblem(search.SearchProblem):
 
     def getCells(self, state):
         puzzleArray = []
-        for row in range( 3 ):
-            for col in range( 3 ):
+        for row in range( 5 ):
+            for col in range( 5 ):
                 puzzleArray.append(state.cells[row][col])
 
         return puzzleArray
@@ -263,20 +264,22 @@ def createRandomEightPuzzle(moves=100):
       a series of 'moves' random moves to a solved
       puzzle.
     """
-    puzzle = EightPuzzleState([0,1,2,3,4,5,6,7,8])
+    puzzle = EightPuzzleState([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25])
     for i in range(moves):
         # Execute a random legal move
         puzzle = puzzle.result(random.sample(puzzle.legalMoves(), 1)[0])
     return puzzle
 
 if __name__ == '__main__':
-    puzzle = createRandomEightPuzzle(25)
+    puzzle = EightPuzzleState([1, 2, 7, 3, 4, 5, 6, 12, 8, 9, 10, 11, 13, 18, 14, 15, 16, 22, 19, 0, 20, 21, 23, 17, 24])
     print('A random puzzle:')
     print(puzzle)
-
     problem = EightPuzzleSearchProblem(puzzle)
-    path = search.aStarSearch(problem)
-    print('A* found a path of %d moves: %s' % (len(path), str(path)))
+    start_time = time.time()
+    path = search.bfs(problem)
+    end_time = time.time();
+    print('astar found a path of %d moves: %s' % (len(path), str(path)))
+    print("--- %s seconds ---" % (end_time - start_time))
     curr = puzzle
     i = 1
     for a in path:
